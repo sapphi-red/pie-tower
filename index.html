@@ -4,10 +4,16 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    <title>Solid App</title>
+    <title>Pie Tower</title>
   </head>
-  <body>
+  <body class="container" w:mx="auto" w:my="8" w:text="text-primary" w:bg="bg-primary">
     <noscript>You need to enable JavaScript to run this app.</noscript>
+
+    <section class="flex" w:flex="col" w:items="center" w:p="4">
+      <h1 w:text="5xl" w:my="2">Pie Tower</h1>
+      <p w:text="xl">Find your flaky tests.</p>
+    </section>
+
     <div id="root"></div>
 
     <script src="/src/index.tsx" type="module"></script>

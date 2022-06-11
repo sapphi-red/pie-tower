@@ -48,20 +48,63 @@ export type JobWithLog = {
   log: string
 }
 
-export const fetchAll = async (token: string) => {
+export type Progress = {
+  totalWorkflows: number | null
+  fetchedWorkflows: number
+  totalFailedJobs: number | null
+  fetchedJobLogs: number
+}
+
+export const fetchAll = async (
+  token: string,
+  onProgress: (p: Progress) => void
+) => {
   if (token === '') return
 
+  onProgress({
+    totalWorkflows: null,
+    fetchedWorkflows: 0,
+    totalFailedJobs: null,
+    fetchedJobLogs: 0
+  })
   const list = await getWorkflowList(token)
+  onProgress({
+    totalWorkflows: list.length,
+    fetchedWorkflows: 0,
+    totalFailedJobs: null,
+    fetchedJobLogs: 0
+  })
+
   const failedJobs: Job[] = []
-  for (const workflow of list) {
+  for (const [i, workflow] of list.entries()) {
     const result = await getFailedJobs(token, workflow)
     failedJobs.push(...result)
+
+    onProgress({
+      totalWorkflows: list.length,
+      fetchedWorkflows: i,
+      totalFailedJobs: null,
+      fetchedJobLogs: 0
+    })
   }
+  onProgress({
+    totalWorkflows: list.length,
+    fetchedWorkflows: list.length,
+    totalFailedJobs: failedJobs.length,
+    fetchedJobLogs: 0
+  })
 
   const data: JobWithLog[] = []
-  for (const failedJob of failedJobs) {
+  for (const [i, failedJob] of failedJobs.entries()) {
     const log = await fetchJobLog(token, 'vitejs', 'vite', failedJob.id)
     data.push({ job: failedJob, log })
+
+    onProgress({
+      totalWorkflows: list.length,
+      fetchedWorkflows: list.length,
+      totalFailedJobs: failedJobs.length,
+      fetchedJobLogs: i
+    })
   }
 
   return data

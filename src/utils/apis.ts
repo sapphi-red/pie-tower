@@ -49,6 +49,7 @@ export const fetchWorkflowList = async (
   }>(token, `/repos/${owner}/${repo}/actions/runs`, {
     branch,
     status,
+    event: 'push',
     created: `>${created.toISOString()}`,
     per_page: '100'
   })
