@@ -1,3 +1,5 @@
+import { get, set, createStore } from 'idb-keyval'
+
 const BASE = 'https://api.github.com'
 
 const fetchApi = async (
@@ -56,6 +58,10 @@ export interface Job {
   conclusion: string
 }
 
+const attemptJobsStore = createStore('pie-tower:attempt-jobs', 'store')
+
+type FetchJobsResponse = { total_count: number; jobs: Job[] }
+
 export const fetchJobs = async (
   token: string,
   owner: string,
@@ -63,14 +69,25 @@ export const fetchJobs = async (
   runId: number,
   attemptNumber: number
 ) => {
-  return await fetchApiJson<{ total_count: number; jobs: Job[] }>(
+  const key = `${owner}/${repo}:${runId}:${attemptNumber}`
+  const cached = await get<FetchJobsResponse>(key, attemptJobsStore)
+  if (cached !== undefined) {
+    return cached
+  }
+
+  const data = await fetchApiJson<FetchJobsResponse>(
     token,
     `/repos/${owner}/${repo}/actions/runs/${runId}/attempts/${attemptNumber}/jobs`,
     {
       per_page: '100'
     }
   )
+
+  await set(key, data, attemptJobsStore)
+  return data
 }
+
+const jobLogsStore = createStore('pie-tower:job-logs', 'store')
 
 export const fetchJobLog = async (
   token: string,
@@ -78,10 +95,24 @@ export const fetchJobLog = async (
   repo: string,
   jobId: number
 ) => {
-  const res = await fetchApi(
-    token,
-    `/repos/${owner}/${repo}/actions/jobs/${jobId}/logs`
-  )
+  const key = `${owner}/${repo}:${jobId}`
+  const cached = await get<string>(key, jobLogsStore)
+  if (cached !== undefined) {
+    return cached
+  }
+
+  let res: Response
+  try {
+    res = await fetchApi(
+      token,
+      `/repos/${owner}/${repo}/actions/jobs/${jobId}/logs`
+    )
+  } catch {
+    return ''
+  }
+
   const log = await res.text()
+
+  await set(key, log, jobLogsStore)
   return log
 }
