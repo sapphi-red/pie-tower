@@ -1,9 +1,20 @@
-import type { Component } from 'solid-js';
+import { Component, createResource, For } from 'solid-js'
+import { fetchAll } from './fetcher'
+import Job from './Job'
+import TokenInput from './TokenInput'
+import useLocalStorage from './useLocalStorage'
 
 const App: Component = () => {
-  return (
-    <p class="text-4xl text-green-700 text-center py-20">Hello windi-css!</p>
-  );
-};
+  const [token, setToken] = useLocalStorage('pie-tower:github-token', '')
+  const [data, { refetch }] = createResource(token, fetchAll)
 
-export default App;
+  return (
+    <>
+      <button onClick={refetch}>fetch</button>
+      <TokenInput token={token()} onTokenChange={setToken} />
+      <For each={data()}>{(job) => <Job job={job} />}</For>
+    </>
+  )
+}
+
+export default App
