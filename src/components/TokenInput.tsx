@@ -1,4 +1,5 @@
 import { Component, JSX } from 'solid-js'
+import TextInput from './TextInput'
 
 const TokenInput: Component<
   {
@@ -6,21 +7,17 @@ const TokenInput: Component<
     onTokenChange: (val: string) => void
   } & Omit<
     JSX.InputHTMLAttributes<HTMLInputElement>,
-    'type' | 'autocomplete' | 'placeholder' | 'value' | 'onChange'
+    'type' | 'autocomplete' | 'value' | 'onChange'
   >
 > = (props) => {
   return (
-    <input
-      w:bg="bg-tertiary"
-      w:p="x-2 y-1"
-      w:border="rounded"
-      {...props}
+    <TextInput
+      label="GitHub Token: "
       type="password"
       autocomplete="off"
-      placeholder="GitHub Token"
       value={props.token}
       onChange={(e) => props.onTokenChange(e.currentTarget.value)}
-    ></input>
+    />
   )
 }
 

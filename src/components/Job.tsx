@@ -1,5 +1,5 @@
 import { Component, createMemo, onMount } from 'solid-js'
-import { JobWithLog } from './fetcher'
+import { JobWithLog } from '../fetcher'
 import stripAnsi from 'strip-ansi'
 
 const removeTimeStamps = (log: string) => {

@@ -1,7 +1,15 @@
-import { Component, createResource, createSignal, For, Show } from 'solid-js'
+import {
+  Component,
+  createMemo,
+  createResource,
+  createSignal,
+  For,
+  Show
+} from 'solid-js'
+import TextInput from './components/TextInput'
 import { fetchAll, Progress } from './fetcher'
-import Job from './Job'
-import TokenInput from './TokenInput'
+import Job from './components/Job'
+import TokenInput from './components/TokenInput'
 import useLocalStorage from './useLocalStorage'
 
 const App: Component = () => {
@@ -16,6 +24,15 @@ const App: Component = () => {
     } finally {
       setProgress(undefined)
     }
+  })
+
+  const [exclude, setExclude] = createSignal('')
+
+  const filteredData = createMemo(() => {
+    const data = dataOrError()?.value ?? []
+    if (exclude() === '') return data
+    const regex = new RegExp(exclude())
+    return data.filter((job) => !regex.test(job.log))
   })
 
   return (
@@ -35,6 +52,12 @@ const App: Component = () => {
           onTokenChange={setToken}
           readOnly={dataOrError.loading}
         />
+        <TextInput
+          label="Exclude: "
+          type="text"
+          value={exclude()}
+          onChange={(e) => setExclude(e.currentTarget.value)}
+        />
       </section>
       <section w:m="y-4">
         <Show when={dataOrError.loading}>
@@ -44,7 +67,7 @@ const App: Component = () => {
           when={dataOrError() && dataOrError().error === undefined}
           fallback={dataOrError()?.error}
         >
-          <For each={dataOrError().value}>{(job) => <Job job={job} />}</For>
+          <For each={filteredData()}>{(job) => <Job job={job} />}</For>
         </Show>
       </section>
     </>
