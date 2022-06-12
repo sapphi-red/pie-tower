@@ -10,19 +10,19 @@ import TextInput from './components/TextInput'
 import { fetchAll, Progress } from './fetcher'
 import Job from './components/Job'
 import TokenInput from './components/TokenInput'
-import useLocalStorage from './useLocalStorage'
+import createLocalStorageSignal from './createLocalStorageSignal'
 import { formatLog } from './utils/formatLog'
 
 const App: Component = () => {
-  const [repository, setRepository] = useLocalStorage(
+  const [repository, setRepository] = createLocalStorageSignal(
     'pie-tower:repository',
     'vitejs/vite'
   )
   const owner = createMemo(() => repository().split('/')[0] ?? '')
   const repo = createMemo(() => repository().split('/')[1] ?? '')
-  const [branch, setBranch] = useLocalStorage('pie-tower:branch', 'main')
+  const [branch, setBranch] = createLocalStorageSignal('pie-tower:branch', 'main')
 
-  const [token, setToken] = useLocalStorage('pie-tower:github-token', '')
+  const [token, setToken] = createLocalStorageSignal('pie-tower:github-token', '')
 
   const [progress, setProgress] = createSignal<Progress>()
   const [dataOrError, { refetch }] = createResource(async () => {
