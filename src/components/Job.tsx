@@ -11,12 +11,10 @@ const removeTimeStamps = (log: string) => {
 
 const Job: Component<{ job: JobWithLog }> = (props) => {
   const formattedLog = createMemo(() =>
-    removeTimeStamps(
-      stripAnsi(props.job.log).replace(
-        /##\[error\]Process completed with exit code 1\..*$/s,
-        ''
-      )
-    )
+    removeTimeStamps(stripAnsi(props.job.log))
+      .replace(/##\[error\]Process completed with exit code 1\..*$/s, '')
+      .replace(/^.*Summary of all failing tests/s, '')
+      .replace(/^.*FATAL ERROR: /s, 'FATAL ERROR: ')
   )
 
   let preRef: HTMLPreElement | undefined
@@ -37,7 +35,7 @@ const Job: Component<{ job: JobWithLog }> = (props) => {
           {props.job.job.name}
         </h2>
       </a>
-      <pre ref={preRef} class="max-h-80 overflow-y-auto">
+      <pre ref={preRef} class="max-h-120 overflow-y-auto">
         <code>{formattedLog}</code>
       </pre>
     </div>
