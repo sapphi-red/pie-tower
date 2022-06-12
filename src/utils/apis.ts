@@ -38,19 +38,21 @@ export const fetchWorkflowList = async (
   token: string,
   owner: string,
   repo: string,
-  { branch, status }: { branch?: string; status?: string } = {}
+  {
+    branch,
+    status,
+    event,
+    created
+  }: { branch?: string; status?: string; event?: string; created?: string } = {}
 ) => {
-  const created = new Date()
-  created.setDate(created.getDate() - 90) // retention default is 90 days
-
   return await fetchApiJson<{
     total_count: number
     workflow_runs: WorkflowRun[]
   }>(token, `/repos/${owner}/${repo}/actions/runs`, {
     branch,
     status,
-    event: 'push',
-    created: `>${created.toISOString()}`,
+    event,
+    created,
     per_page: '100'
   })
 }

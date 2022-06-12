@@ -6,21 +6,32 @@ import {
   WorkflowRun
 } from './utils/apis'
 
-const getWorkflowList = async (token: string) => {
-  let { workflow_runs: list } = await fetchWorkflowList(
-    token,
-    'vitejs',
-    'vite',
-    {
-      branch: 'main',
-      status: 'failure'
-    }
-  )
+const getWorkflowList = async (
+  token: string,
+  owner: string,
+  repo: string,
+  branch: string,
+  retentionDays: number
+) => {
+  const created = new Date()
+  created.setDate(created.getDate() - retentionDays)
+
+  let { workflow_runs: list } = await fetchWorkflowList(token, owner, repo, {
+    branch: branch,
+    status: 'failure',
+    event: 'push',
+    created: `>${created.toISOString()}`
+  })
   list = list.filter((workflow) => workflow.name === 'CI')
   return list
 }
 
-const getFailedJobs = async (token: string, workflow: WorkflowRun) => {
+const getFailedJobs = async (
+  token: string,
+  owner: string,
+  repo: string,
+  workflow: WorkflowRun
+) => {
   const attemptNumbers = Array.from(
     { length: workflow.run_attempt },
     (_, i) => i + 1
@@ -29,8 +40,8 @@ const getFailedJobs = async (token: string, workflow: WorkflowRun) => {
     attemptNumbers.map(async (attemptNumber) => {
       const { jobs } = await fetchJobs(
         token,
-        'vitejs',
-        'vite',
+        owner,
+        repo,
         workflow.id,
         attemptNumber
       )
@@ -57,6 +68,10 @@ export type Progress = {
 
 export const fetchAll = async (
   token: string,
+  owner: string,
+  repo: string,
+  branch: string,
+  retentionDays: number,
   onProgress: (p: Progress) => void
 ) => {
   if (token === '') return
@@ -67,7 +82,7 @@ export const fetchAll = async (
     totalFailedJobs: null,
     fetchedJobLogs: 0
   })
-  const list = await getWorkflowList(token)
+  const list = await getWorkflowList(token, owner, repo, branch, retentionDays)
   onProgress({
     totalWorkflows: list.length,
     fetchedWorkflows: 0,
@@ -77,7 +92,7 @@ export const fetchAll = async (
 
   const failedJobs: Job[] = []
   for (const [i, workflow] of list.entries()) {
-    const result = await getFailedJobs(token, workflow)
+    const result = await getFailedJobs(token, owner, repo, workflow)
     failedJobs.push(...result)
 
     onProgress({
@@ -96,7 +111,7 @@ export const fetchAll = async (
 
   const data: JobWithLog[] = []
   for (const [i, failedJob] of failedJobs.entries()) {
-    const log = await fetchJobLog(token, 'vitejs', 'vite', failedJob.id)
+    const log = await fetchJobLog(token, owner, repo, failedJob.id)
     data.push({ job: failedJob, log })
 
     onProgress({

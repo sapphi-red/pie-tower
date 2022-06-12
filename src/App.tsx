@@ -14,12 +14,31 @@ import useLocalStorage from './useLocalStorage'
 import { formatLog } from './utils/formatLog'
 
 const App: Component = () => {
+  const [repository, setRepository] = useLocalStorage(
+    'pie-tower:repository',
+    'vitejs/vite'
+  )
+  const owner = createMemo(() => repository().split('/')[0] ?? '')
+  const repo = createMemo(() => repository().split('/')[1] ?? '')
+  const [branch, setBranch] = useLocalStorage('pie-tower:branch', 'main')
+
   const [token, setToken] = useLocalStorage('pie-tower:github-token', '')
 
   const [progress, setProgress] = createSignal<Progress>()
   const [dataOrError, { refetch }] = createResource(async () => {
     try {
-      return { value: await fetchAll(token(), setProgress) } as const
+      const retentionDays = 90 // retention default is 90 days
+
+      return {
+        value: await fetchAll(
+          token(),
+          owner(),
+          repo(),
+          branch(),
+          retentionDays,
+          setProgress
+        )
+      } as const
     } catch (e) {
       return { error: e } as const
     } finally {
@@ -44,6 +63,28 @@ const App: Component = () => {
   return (
     <>
       <section w:m="y-4">
+        <TextInput
+          label="Repository: "
+          type="text"
+          value={repository()}
+          onChange={(e) => {
+            const value = e.currentTarget.value
+            if (/^[\w-]+\/[\w-]+$/.test(value)) {
+              setRepository(value)
+            }
+          }}
+        />
+        <TextInput
+          label="Branch: "
+          type="text"
+          value={branch()}
+          onChange={(e) => setBranch(e.currentTarget.value)}
+        />
+        <TokenInput
+          token={token()}
+          onTokenChange={setToken}
+          readOnly={dataOrError.loading}
+        />
         <button
           w:bg="bg-secondary"
           w:p="1"
@@ -53,11 +94,8 @@ const App: Component = () => {
         >
           fetch
         </button>
-        <TokenInput
-          token={token()}
-          onTokenChange={setToken}
-          readOnly={dataOrError.loading}
-        />
+      </section>
+      <section w:m="y-4">
         <TextInput
           label="Exclude: "
           type="text"
