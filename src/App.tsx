@@ -11,6 +11,7 @@ import { fetchAll, Progress } from './fetcher'
 import Job from './components/Job'
 import TokenInput from './components/TokenInput'
 import useLocalStorage from './useLocalStorage'
+import { formatLog } from './utils/formatLog'
 
 const App: Component = () => {
   const [token, setToken] = useLocalStorage('pie-tower:github-token', '')
@@ -28,8 +29,13 @@ const App: Component = () => {
 
   const [exclude, setExclude] = createSignal('')
 
-  const filteredData = createMemo(() => {
+  const formattedData = createMemo(() => {
     const data = dataOrError()?.value ?? []
+    return data.map((job) => ({ ...job, log: formatLog(job.log) }))
+  })
+
+  const filteredData = createMemo(() => {
+    const data = formattedData()
     if (exclude() === '') return data
     const regex = new RegExp(exclude())
     return data.filter((job) => !regex.test(job.log))

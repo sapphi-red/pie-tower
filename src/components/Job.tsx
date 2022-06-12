@@ -1,22 +1,7 @@
-import { Component, createMemo, onMount } from 'solid-js'
+import { Component, onMount } from 'solid-js'
 import { JobWithLog } from '../fetcher'
-import stripAnsi from 'strip-ansi'
-
-const removeTimeStamps = (log: string) => {
-  return log
-    .split('\n')
-    .map((line) => line.replace(/^\d+-\d+-\d+T\d+:\d+:\d+\.\d+Z /, ''))
-    .join('\n')
-}
 
 const Job: Component<{ job: JobWithLog }> = (props) => {
-  const formattedLog = createMemo(() =>
-    removeTimeStamps(stripAnsi(props.job.log))
-      .replace(/##\[error\]Process completed with exit code 1\..*$/s, '')
-      .replace(/^.*Summary of all failing tests/s, '')
-      .replace(/^.*FATAL ERROR: /s, 'FATAL ERROR: ')
-  )
-
   let preRef: HTMLPreElement | undefined
   onMount(() => {
     preRef.scrollTop = preRef.scrollHeight
@@ -36,7 +21,7 @@ const Job: Component<{ job: JobWithLog }> = (props) => {
         </h2>
       </a>
       <pre ref={preRef} class="max-h-120 overflow-y-auto">
-        <code>{formattedLog}</code>
+        <code>{props.job.log}</code>
       </pre>
     </div>
   )
