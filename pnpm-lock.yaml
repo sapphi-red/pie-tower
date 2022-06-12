@@ -1,7 +1,10 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@types/node': ^17.0.42
   idb-keyval: ^6.1.0
+  p-map: ^5.5.0
+  p-queue: ^7.2.0
   solid-js: ^1.4.4
   strip-ansi: ^7.0.1
   typescript: ^4.7.3
@@ -12,10 +15,13 @@ specifiers:
 
 dependencies:
   idb-keyval: 6.1.0
+  p-map: 5.5.0
+  p-queue: 7.2.0
   solid-js: 1.4.4
   strip-ansi: 7.0.1
 
 devDependencies:
+  '@types/node': 17.0.42
   typescript: 4.7.3
   vite: 2.9.12
   vite-plugin-solid: 2.2.6
@@ -381,6 +387,10 @@ packages:
       fastq: 1.13.0
     dev: true
 
+  /@types/node/17.0.42:
+    resolution: {integrity: sha512-Q5BPGyGKcvQgAMbsr7qEGN/kIPN6zZecYYABeTDBizOsau+2NMdSVTar9UQw21A2+JyA2KRNDYaYrPB0Rpk2oQ==}
+    dev: true
+
   /@windicss/config/1.8.4:
     resolution: {integrity: sha512-i4fFGFfZoRess6WMkauykHC3PFd9xKYVx7lSuLfMK7sgo6x3+l4dY42GbsWMHyLqH1sTMfyt1LgfXSIKYJozSA==}
     dependencies:
@@ -404,6 +414,14 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /aggregate-error/4.0.1:
+    resolution: {integrity: sha512-0poP0T7el6Vq3rstR8Mn4V/IQrpBLO6POkUSrN7RhyY+GF/InCFShQzsQ39T25gkHhLgSLByyAz+Kjb+c2L98w==}
+    engines: {node: '>=12'}
+    dependencies:
+      clean-stack: 4.2.0
+      indent-string: 5.0.0
+    dev: false
 
   /ansi-regex/6.0.1:
     resolution: {integrity: sha512-n5M855fKb2SsfMIiFFoVrABHJC8QtHwVx+mHWP3QcEqBHYienj5dHSgjbxtC0WEZXYt4wcD6zrQElDPhFuZgfA==}
@@ -467,6 +485,13 @@ packages:
       escape-string-regexp: 1.0.5
       supports-color: 5.5.0
     dev: true
+
+  /clean-stack/4.2.0:
+    resolution: {integrity: sha512-LYv6XPxoyODi36Dp976riBtSY27VmFo+MKqEU9QCCWyTrdEPDog+RWA7xQWHi6Vbp61j5c4cdzzX1NidnwtUWg==}
+    engines: {node: '>=12'}
+    dependencies:
+      escape-string-regexp: 5.0.0
+    dev: false
 
   /color-convert/1.9.3:
     resolution: {integrity: sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg==}
@@ -714,9 +739,18 @@ packages:
     dev: true
 
   /escape-string-regexp/1.0.5:
-    resolution: {integrity: sha1-G2HAViGQqN/2rjuyzwIAyhMLhtQ=}
+    resolution: {integrity: sha512-vbRorB5FUQWvla16U8R/qgaFIya2qGzwDrNmCZuYKrbdSUMG6I1ZCGQRefkRVhuOkIGVne7BQ35DSfo1qvJqFg==}
     engines: {node: '>=0.8.0'}
     dev: true
+
+  /escape-string-regexp/5.0.0:
+    resolution: {integrity: sha512-/veY75JbMK4j1yjvuUxuVsiS/hr/4iHs9FTT6cgTexxdE0Ly/glccBAkloH/DofkjRbZU3bnoj38mOmhkZ0lHw==}
+    engines: {node: '>=12'}
+    dev: false
+
+  /eventemitter3/4.0.7:
+    resolution: {integrity: sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==}
+    dev: false
 
   /fast-glob/3.2.11:
     resolution: {integrity: sha512-xrO3+1bxSo3ZVHAnqzyuewYT6aMFHRAd4Kcs92MAonjwQZLsK9d0SF1IyQ3k5PoirxTW0Oe/RqFgMQ6TcNE5Ew==}
@@ -791,6 +825,11 @@ packages:
     resolution: {integrity: sha512-u/qHZ75rlD3gH+Zah8dAJVJcGW/RfCnfNrFkElC5RpRCnpsCXXhqjVk+6MoVKJ3WhmNbRYdI6IIVP88e+5sxGw==}
     dependencies:
       safari-14-idb-fix: 3.0.0
+    dev: false
+
+  /indent-string/5.0.0:
+    resolution: {integrity: sha512-m6FAo/spmsW2Ab2fU35JTYwtOKa2yAwXSwgjSv1TJzh4Mh7mC3lzAOVLBprb72XsTrgkEIsl7YrFNAiDiRhIGg==}
+    engines: {node: '>=12'}
     dev: false
 
   /is-core-module/2.9.0:
@@ -887,6 +926,26 @@ packages:
   /node-releases/2.0.2:
     resolution: {integrity: sha512-XxYDdcQ6eKqp/YjI+tb2C5WM2LgjnZrfYg4vgQt49EK268b6gYCHsBLrK2qvJo4FmCtqmKezb0WZFK4fkrZNsg==}
     dev: true
+
+  /p-map/5.5.0:
+    resolution: {integrity: sha512-VFqfGDHlx87K66yZrNdI4YGtD70IRyd+zSvgks6mzHPRNkoKy+9EKP4SFC77/vTTQYmRmti7dvqC+m5jBrBAcg==}
+    engines: {node: '>=12'}
+    dependencies:
+      aggregate-error: 4.0.1
+    dev: false
+
+  /p-queue/7.2.0:
+    resolution: {integrity: sha512-Kvv7p13M46lTYLQ/PsZdaj/1Vj6u/8oiIJgyQyx4oVkOfHdd7M2EZvXigDvcsSzRwanCzQirV5bJPQFoSQt5MA==}
+    engines: {node: '>=12'}
+    dependencies:
+      eventemitter3: 4.0.7
+      p-timeout: 5.1.0
+    dev: false
+
+  /p-timeout/5.1.0:
+    resolution: {integrity: sha512-auFDyzzzGZZZdHz3BtET9VEz0SE/uMEAx7uWfGPucfzEwwe/xH0iVeZibQmANYE/hp9T2+UUZT5m+BKyrDp3Ew==}
+    engines: {node: '>=12'}
+    dev: false
 
   /path-parse/1.0.7:
     resolution: {integrity: sha512-LDJzPVEEEPR+y48z93A0Ed0yXb8pAByGWo/k5YYdYgpY2/2EsOsksJrq7lOHxryrVOn1ejG6oAp8ahvOIQD8sw==}

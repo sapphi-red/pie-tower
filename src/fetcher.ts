@@ -5,6 +5,7 @@ import {
   Job,
   WorkflowRun
 } from './utils/apis'
+import pMap from 'p-map'
 
 const getWorkflowList = async (
   token: string,
@@ -36,18 +37,16 @@ const getFailedJobs = async (
     { length: workflow.run_attempt },
     (_, i) => i + 1
   )
-  const jobsList = await Promise.all(
-    attemptNumbers.map(async (attemptNumber) => {
-      const { jobs } = await fetchJobs(
-        token,
-        owner,
-        repo,
-        workflow.id,
-        attemptNumber
-      )
-      return jobs
-    })
-  )
+  const jobsList = await pMap(attemptNumbers, async (attemptNumber) => {
+    const { jobs } = await fetchJobs(
+      token,
+      owner,
+      repo,
+      workflow.id,
+      attemptNumber
+    )
+    return jobs
+  })
   const failedJobs = jobsList
     .flatMap((jobs) => jobs)
     .filter((job) => job.conclusion === 'failure')
@@ -90,18 +89,20 @@ export const fetchAll = async (
     fetchedJobLogs: 0
   })
 
-  const failedJobs: Job[] = []
-  for (const [i, workflow] of list.entries()) {
-    const result = await getFailedJobs(token, owner, repo, workflow)
-    failedJobs.push(...result)
-
-    onProgress({
-      totalWorkflows: list.length,
-      fetchedWorkflows: i,
-      totalFailedJobs: null,
-      fetchedJobLogs: 0
+  let fetchedWorkflows = 0
+  const failedJobs = (
+    await pMap(list, async (workflow) => {
+      const result = await getFailedJobs(token, owner, repo, workflow)
+      fetchedWorkflows++
+      onProgress({
+        totalWorkflows: list.length,
+        fetchedWorkflows,
+        totalFailedJobs: null,
+        fetchedJobLogs: 0
+      })
+      return result
     })
-  }
+  ).flat()
   onProgress({
     totalWorkflows: list.length,
     fetchedWorkflows: list.length,
@@ -109,18 +110,18 @@ export const fetchAll = async (
     fetchedJobLogs: 0
   })
 
-  const data: JobWithLog[] = []
-  for (const [i, failedJob] of failedJobs.entries()) {
+  let fetchedJobLogs = 0
+  const data = await pMap(failedJobs, async (failedJob) => {
     const log = await fetchJobLog(token, owner, repo, failedJob.id)
-    data.push({ job: failedJob, log })
-
+    fetchedJobLogs++
     onProgress({
       totalWorkflows: list.length,
       fetchedWorkflows: list.length,
       totalFailedJobs: failedJobs.length,
-      fetchedJobLogs: i
+      fetchedJobLogs
     })
-  }
+    return { job: failedJob, log }
+  })
 
   return data
 }

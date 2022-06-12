@@ -1,6 +1,9 @@
 import { get, set, createStore } from 'idb-keyval'
+import PQueue from 'p-queue'
 
 const BASE = 'https://api.github.com'
+
+const pqueue = new PQueue({ concurrency: 5 })
 
 const fetchApi = async (
   token: string,
@@ -9,12 +12,12 @@ const fetchApi = async (
 ) => {
   const url = new URL(path, BASE)
   url.search = new URLSearchParams(queries).toString()
-  const res = await fetch(url, {
+  const res = await pqueue.add(() => fetch(url, {
     headers: {
       Accept: 'application/vnd.github.v3+json',
       Authorization: `token ${token}`
     }
-  })
+  }))
   if (!res.ok) throw new Error('Response was not 200')
   return res
 }
