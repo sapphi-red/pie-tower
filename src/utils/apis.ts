@@ -12,12 +12,14 @@ const fetchApi = async (
 ) => {
   const url = new URL(path, BASE)
   url.search = new URLSearchParams(queries).toString()
-  const res = await pqueue.add(() => fetch(url, {
-    headers: {
-      Accept: 'application/vnd.github.v3+json',
-      Authorization: `token ${token}`
-    }
-  }))
+  const res = await pqueue.add(() =>
+    fetch(url, {
+      headers: {
+        Accept: 'application/vnd.github.v3+json',
+        Authorization: `token ${token}`
+      }
+    })
+  )
   if (!res.ok) throw new Error('Response was not 200')
   return res
 }
@@ -35,6 +37,7 @@ export interface WorkflowRun {
   id: number
   name: string
   run_attempt: number
+  conclusion: string
 }
 
 export const fetchWorkflowList = async (
@@ -46,7 +49,12 @@ export const fetchWorkflowList = async (
     status,
     event,
     created
-  }: { branch?: string; status?: string; event?: string; created?: string } = {}
+  }: {
+    branch?: string
+    status?: string
+    event?: string
+    created?: string
+  } = {}
 ) => {
   return await fetchApiJson<{
     total_count: number

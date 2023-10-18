@@ -19,11 +19,15 @@ const getWorkflowList = async (
 
   let { workflow_runs: list } = await fetchWorkflowList(token, owner, repo, {
     branch: branch,
-    status: 'failure',
+    status: 'completed',
     event: 'push',
     created: `>${created.toISOString()}`
   })
-  list = list.filter((workflow) => workflow.name === 'CI')
+  list = list.filter(
+    (workflow) =>
+      workflow.name === 'CI' &&
+      (workflow.run_attempt > 1 || workflow.conclusion === 'failure')
+  )
   return list
 }
 
