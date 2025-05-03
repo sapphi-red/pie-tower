@@ -12,14 +12,14 @@ const fetchApi = async (
 ) => {
   const url = new URL(path, BASE)
   url.search = new URLSearchParams(queries).toString()
-  const res = await pqueue.add(() =>
+  const res = (await pqueue.add(() =>
     fetch(url, {
       headers: {
         Accept: 'application/vnd.github.v3+json',
         Authorization: `token ${token}`
       }
     })
-  )
+  )) as Response
   if (!res.ok) throw new Error('Response was not 200')
   return res
 }
