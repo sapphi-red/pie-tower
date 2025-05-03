@@ -1,4 +1,4 @@
-import { AttributifyNames } from 'windicss/types/jsx'
+import type { AttributifyNames } from 'unocss/preset-attributify'
 
 declare module 'solid-js' {
   namespace JSX {
